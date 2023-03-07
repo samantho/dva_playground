@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Spotify Recommender</title>
+    <style>
+        html,
+        body,
+        #container {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.8.0/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.8.0/js/anychart-graph.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.8.0/js/anychart-data-adapter.min.js"></script>
+</head>
+
+<body>
+    <div id="container"></div>
+    <script>
+
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        var requestOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+        };
+
+        var artist_name = "Drake"
+
+        fetch("https://rmanaqd7j4.execute-api.us-east-1.amazonaws.com/default/spot?artist=" + artist_name, requestOptions)
+            .then(response => response.text())
+            .then(function (result) {
+                const txt = JSON.parse(result)
+                const data = txt['body']
+                console.log(data)
+                data['nodes'][0]['fill'] = {
+                    src: "https://play-lh.googleusercontent.com/P2VMEenhpIsubG2oWbvuLGrs0GyyzLiDosGTg8bi8htRXg9Uf0eUtHiUjC28p1jgHzo"
+                }
+                data['nodes'][0]['height'] = 60
+                console.log(data['nodes'][0])
+
+                // create a chart from the loaded data
+                var chart = anychart.graph(data);
+                var nodes = chart.nodes();
+                var edges = chart.edges();
+
+                // set the title
+                chart.title("Most Similar Artists from Playlists");
+
+                // chart.layout().iterationCount(0);
+
+                // set the size of nodes
+                nodes.normal().height(30);
+                nodes.hovered().height(45);
+                nodes.selected().height(45);
+
+                // set the fill of nodes
+                nodes.normal().fill("green");
+                nodes.hovered().fill("white");
+                nodes.selected().fill("white");
+
+                // set the stroke of nodes
+                nodes.normal().stroke(null);
+                nodes.hovered().stroke("green", 3);
+                nodes.selected().stroke("green", 3);
+
+                // enable the labels of nodes
+                chart.nodes().labels().enabled(true);
+
+                // configure the labels of nodes
+                chart.nodes().labels().format("{%id}");
+                chart.nodes().labels().fontSize(12);
+                chart.nodes().labels().fontWeight(600);
+
+                // enable the labels of edges
+                // chart.edges().labels().enabled(true);
+
+                // // configure the labels of edges
+                // chart.edges().labels().format("{%freq}");
+                // chart.edges().labels().fontSize(12);
+                // chart.edges().labels().fontWeight(600);
+
+                // edges.normal().labels().stroke(null);
+                // edges.labels().hovered().stroke("green", 8);
+                // edges.labels().selected().stroke("green", 8);
+
+                edges.normal().stroke("green");
+                edges.hovered().stroke("green", 5);
+                edges.selected().stroke("green", 5);
+
+                var tooltipConfig = {
+                    title: true,
+                    separator: true,
+                    titleFormat: '{%from} to {%to}',
+                    format: 'Frequency {%freq}',
+                    enabled: true
+                };
+                chart.edges().tooltip(tooltipConfig);
+
+                // draw the chart
+                chart.container("container").draw();
+
+
+            })
+            .catch(error => console.log('error', error));
+
+    </script>
+</body>
+
+</html>
