@@ -22,96 +22,144 @@
 </head>
 
 <body>
+    <form onsubmit="validateForm()" id="myForm">
+        <label for="artistSelect">Artist name:</label><br>
+        <input id="artistSelect" name="artistSelect" type="text" required></input>
+        <input type="submit"></input><br>
+        <span id="error"></span>
+    </form>
     <div id="container"></div>
+    <div id="artistData">
+        <h1>Artist Stuff</h1>
+    </div>
+
     <script>
 
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
+        var artist_names = [];
+        var artist_uris = [];
 
-        var requestOptions = {
-            method: 'GET',
-            headers: myHeaders,
-            redirect: 'follow'
-        };
+        var form = document.getElementById("myForm");
+        form.style.display = "none";
+        function handleForm(event) { event.preventDefault(); };
+        form.addEventListener('submit', handleForm);
 
-        var artist_name = "Drake"
+        document.getElementById("artistData").style.display = "none";
 
-        fetch("https://rmanaqd7j4.execute-api.us-east-1.amazonaws.com/default/spot?artist=" + artist_name, requestOptions)
-            .then(response => response.text())
-            .then(function (result) {
-                const txt = JSON.parse(result)
-                const data = txt['body']
-                console.log(data)
-                data['nodes'][0]['fill'] = {
-                    src: "https://play-lh.googleusercontent.com/P2VMEenhpIsubG2oWbvuLGrs0GyyzLiDosGTg8bi8htRXg9Uf0eUtHiUjC28p1jgHzo"
+        d3.csv("artists.csv", (d) => {
+            artist_names.push(d.artist_name)
+            artist_uris.push(d.artist_uri)
+        }).then((d) => {
+            form.style.display = "block";
+        });
+
+        let artist_name = "Drake";
+        var chart;
+        var start = 0;
+
+        function generate_graph(x) {
+            // GET GRAPH FROM AWS
+
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            var requestOptions = {
+                method: 'GET',
+                headers: myHeaders,
+                redirect: 'follow'
+            };
+
+            artist_name = x;
+
+            fetch("https://rmanaqd7j4.execute-api.us-east-1.amazonaws.com/default/spot?artist=" + artist_name, requestOptions)
+                .then(response => response.text())
+                .then(function (result) {
+                    const txt = JSON.parse(result)
+                    const data = txt['body']
+                    console.log(data)
+                    data['nodes'][0]['fill'] = {
+                        src: "https://play-lh.googleusercontent.com/P2VMEenhpIsubG2oWbvuLGrs0GyyzLiDosGTg8bi8htRXg9Uf0eUtHiUjC28p1jgHzo"
+                    }
+                    data['nodes'][0]['height'] = 60
+                    console.log(data['nodes'][0])
+                    // for (let i = 0; i < 10; i++) {
+                    //     data['edges'][i]['stroke'] = "black";
+                    //     // data['edges'][i]['stroke-width'] = 15;
+                    // }
+
+                    // create a chart from the loaded data
+                    chart = anychart.graph(data);
+                    var nodes = chart.nodes();
+                    var edges = chart.edges();
+
+                    // set the title
+                    chart.title("Most Similar Artists from Playlists");
+
+                    // set the size of nodes
+                    nodes.normal().height(30);
+                    nodes.hovered().height(45);
+                    nodes.selected().height(45);
+
+                    // set the fill of nodes
+                    nodes.normal().fill("green");
+                    nodes.hovered().fill("white");
+                    nodes.selected().fill("white");
+
+                    // set the stroke of nodes
+                    nodes.normal().stroke(null);
+                    nodes.hovered().stroke("green", 3);
+                    nodes.selected().stroke("green", 3);
+
+                    // enable the labels of nodes
+                    chart.nodes().labels().enabled(true);
+
+                    // configure the labels of nodes
+                    chart.nodes().labels().format("{%id}");
+                    chart.nodes().labels().fontSize(12);
+                    chart.nodes().labels().fontWeight(600);
+
+                    edges.normal().stroke("green");
+                    edges.hovered().stroke("green", 5);
+                    edges.selected().stroke("green", 5);
+
+                    var tooltipConfig = {
+                        title: true,
+                        separator: true,
+                        titleFormat: '{%from} to {%to}',
+                        format: 'Frequency {%freq}',
+                        enabled: true
+                    };
+                    chart.edges().tooltip(tooltipConfig);
+
+                    // draw the chart
+                    chart.container("container").draw();
+
+
+                })
+                .catch(error => console.log('error', error));
+        }
+
+        function validateForm() {
+            let x = document.getElementById("artistSelect").value;
+            document.getElementById("myForm");
+            var error = document.getElementById("error")
+            // console.log(artist_names)
+            if (artist_names.includes(x)) {
+                error.innerHTML = "<span style='color: green;'>" +
+                    "Artist Chosen: " + x + "</span>";
+                form.reset();
+                generate_graph(x);
+                document.getElementById("artistData").style.display = "block";
+                if (start != 0) {
+                    chart.dispose();
+                } else {
+                    start = 1;
                 }
-                data['nodes'][0]['height'] = 60
-                console.log(data['nodes'][0])
-
-                // create a chart from the loaded data
-                var chart = anychart.graph(data);
-                var nodes = chart.nodes();
-                var edges = chart.edges();
-
-                // set the title
-                chart.title("Most Similar Artists from Playlists");
-
-                // chart.layout().iterationCount(0);
-
-                // set the size of nodes
-                nodes.normal().height(30);
-                nodes.hovered().height(45);
-                nodes.selected().height(45);
-
-                // set the fill of nodes
-                nodes.normal().fill("green");
-                nodes.hovered().fill("white");
-                nodes.selected().fill("white");
-
-                // set the stroke of nodes
-                nodes.normal().stroke(null);
-                nodes.hovered().stroke("green", 3);
-                nodes.selected().stroke("green", 3);
-
-                // enable the labels of nodes
-                chart.nodes().labels().enabled(true);
-
-                // configure the labels of nodes
-                chart.nodes().labels().format("{%id}");
-                chart.nodes().labels().fontSize(12);
-                chart.nodes().labels().fontWeight(600);
-
-                // enable the labels of edges
-                // chart.edges().labels().enabled(true);
-
-                // // configure the labels of edges
-                // chart.edges().labels().format("{%freq}");
-                // chart.edges().labels().fontSize(12);
-                // chart.edges().labels().fontWeight(600);
-
-                // edges.normal().labels().stroke(null);
-                // edges.labels().hovered().stroke("green", 8);
-                // edges.labels().selected().stroke("green", 8);
-
-                edges.normal().stroke("green");
-                edges.hovered().stroke("green", 5);
-                edges.selected().stroke("green", 5);
-
-                var tooltipConfig = {
-                    title: true,
-                    separator: true,
-                    titleFormat: '{%from} to {%to}',
-                    format: 'Frequency {%freq}',
-                    enabled: true
-                };
-                chart.edges().tooltip(tooltipConfig);
-
-                // draw the chart
-                chart.container("container").draw();
-
-
-            })
-            .catch(error => console.log('error', error));
+            } else {
+                error.innerHTML = "<span style='color: red;'>" +
+                    "Artist not found</span>";
+                form.reset();
+            }
+        }
 
     </script>
 </body>
