@@ -1,54 +1,62 @@
 <!DOCTYPE html>
-<html>
 
 <head>
-    <title>Spotify Recommender</title>
     <style>
-        html,
-        body,
-        #container {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
+        path.link {
+            fill: none;
+            stroke: #666;
+            stroke-width: 1.5px;
+        }
+
+        circle {
+            fill: #ccc;
+            stroke: #fff;
+            stroke: black;
+            stroke-width: 1.5px;
+        }
+
+        text {
+            fill: #000;
+            font: 10px sans-serif;
+            pointer-events: none;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://cdn.anychart.com/releases/8.8.0/js/anychart-core.min.js"></script>
-    <script src="https://cdn.anychart.com/releases/8.8.0/js/anychart-graph.min.js"></script>
-    <script src="https://cdn.anychart.com/releases/8.8.0/js/anychart-data-adapter.min.js"></script>
+    <meta charset="utf-8">
+    <title></title>
 </head>
 
 <body>
+
     <form onsubmit="validateForm()" id="myForm">
         <label for="artistSelect">Artist name:</label><br>
         <input id="artistSelect" name="artistSelect" type="text" required></input>
         <input type="submit"></input><br>
         <span id="error"></span>
     </form>
-    <div id="container"></div>
-    <div id="artistData">
-        <h1>Artist Stuff</h1>
-    </div>
+    <svg width="800" height="800" id="artist_graph"></svg>
 
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
+    <script type="text/javascript" src="../lib/d3.v5.min.js"></script>
     <script>
 
         var artist_names = [];
         var artist_uris = [];
 
+        // Form listener for artist selection
         var form = document.getElementById("myForm");
+        // Hide display items before selection
         form.style.display = "none";
         function handleForm(event) { event.preventDefault(); };
         form.addEventListener('submit', handleForm);
 
-        document.getElementById("artistData").style.display = "none";
-
+        // Upload possible artist names
         d3.csv("artists.csv", (d) => {
             artist_names.push(d.artist_name)
             artist_uris.push(d.artist_uri)
         }).then((d) => {
+            // then give option to input once names are loaded
             form.style.display = "block";
         });
 
@@ -56,9 +64,37 @@
         var chart;
         var start = 0;
 
-        function generate_graph(x) {
-            // GET GRAPH FROM AWS
+        // This function is triggered once the artist selection form was submitted
+        function validateForm() {
+            let x = document.getElementById("artistSelect").value;
+            document.getElementById("myForm");
+            var error = document.getElementById("error")
+            if (artist_names.includes(x)) {
+                // If artist is found, print name in green
+                error.innerHTML = "<span style='color: green;'>" +
+                    "Artist Chosen: " + x + "</span>";
+                form.reset();
+                // Then generate the graph
+                createGraph(x);
+                // After graph creation, display artist blocks below
+                // document.getElementById("artistData").style.display = "block";
+                if (start != 0) {
+                    // If a new artist is selected, clear graph
+                    // chart.dispose();
+                    $('#artist_graph').empty();
+                } else {
+                    start = 1;
+                }
+            } else {
+                // If artist is not found, print red error
+                error.innerHTML = "<span style='color: red;'>" +
+                    "Artist not found</span>";
+                form.reset();
+            }
+        }
 
+        // This function creates the artist graph
+        function createGraph(art_name) {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
 
@@ -68,99 +104,127 @@
                 redirect: 'follow'
             };
 
-            artist_name = x;
+            var artist_name = art_name;
+            var links;
+            var data;
 
             fetch("https://rmanaqd7j4.execute-api.us-east-1.amazonaws.com/default/spot?artist=" + artist_name, requestOptions)
                 .then(response => response.text())
-                .then(function (result) {
-                    const txt = JSON.parse(result)
-                    const data = txt['body']
-                    console.log(data)
-                    data['nodes'][0]['fill'] = {
-                        src: "https://play-lh.googleusercontent.com/P2VMEenhpIsubG2oWbvuLGrs0GyyzLiDosGTg8bi8htRXg9Uf0eUtHiUjC28p1jgHzo"
-                    }
-                    data['nodes'][0]['height'] = 60
-                    console.log(data['nodes'][0])
-                    // for (let i = 0; i < 10; i++) {
-                    //     data['edges'][i]['stroke'] = "black";
-                    //     // data['edges'][i]['stroke-width'] = 15;
-                    // }
+                .then(function (data) {
+                    data = JSON.parse(data)
+                    data = data['body']
 
-                    // create a chart from the loaded data
-                    chart = anychart.graph(data);
-                    var nodes = chart.nodes();
-                    var edges = chart.edges();
-
-                    // set the title
-                    chart.title("Most Similar Artists from Playlists");
-
-                    // set the size of nodes
-                    nodes.normal().height(30);
-                    nodes.hovered().height(45);
-                    nodes.selected().height(45);
-
-                    // set the fill of nodes
-                    nodes.normal().fill("green");
-                    nodes.hovered().fill("white");
-                    nodes.selected().fill("white");
-
-                    // set the stroke of nodes
-                    nodes.normal().stroke(null);
-                    nodes.hovered().stroke("green", 3);
-                    nodes.selected().stroke("green", 3);
-
-                    // enable the labels of nodes
-                    chart.nodes().labels().enabled(true);
-
-                    // configure the labels of nodes
-                    chart.nodes().labels().format("{%id}");
-                    chart.nodes().labels().fontSize(12);
-                    chart.nodes().labels().fontWeight(600);
-
-                    edges.normal().stroke("green");
-                    edges.hovered().stroke("green", 5);
-                    edges.selected().stroke("green", 5);
-
-                    var tooltipConfig = {
-                        title: true,
-                        separator: true,
-                        titleFormat: '{%from} to {%to}',
-                        format: 'Frequency {%freq}',
-                        enabled: true
-                    };
-                    chart.edges().tooltip(tooltipConfig);
-
-                    // draw the chart
-                    chart.container("container").draw();
-
-
+                    links = data['edges'];
                 })
-                .catch(error => console.log('error', error));
-        }
+                .then(function (f) {
+                    var nodes = {};
 
-        function validateForm() {
-            let x = document.getElementById("artistSelect").value;
-            document.getElementById("myForm");
-            var error = document.getElementById("error")
-            // console.log(artist_names)
-            if (artist_names.includes(x)) {
-                error.innerHTML = "<span style='color: green;'>" +
-                    "Artist Chosen: " + x + "</span>";
-                form.reset();
-                generate_graph(x);
-                document.getElementById("artistData").style.display = "block";
-                if (start != 0) {
-                    chart.dispose();
-                } else {
-                    start = 1;
-                }
-            } else {
-                error.innerHTML = "<span style='color: red;'>" +
-                    "Artist not found</span>";
-                form.reset();
-            }
-        }
+                    links.forEach(function (link) {
+                        link.from = nodes[link.from] || (nodes[link.from] = { name: link.from });
+                        link.to = nodes[link.to] || (nodes[link.to] = { name: link.to });
+                    });
 
+                    for (const [key, value] of Object.entries(links)) {
+                        links[key]['source'] = { "name": links[key]['from'] }
+                        links[key]['target'] = { "name": links[key]['to'] }
+                        links[key]['value'] = links[key]['freq']
+                    }
+
+                    console.log(nodes)
+                    console.log(links)
+                    var width = 800;
+                    var height = 800;
+
+                    var force = d3.forceSimulation()
+                        .nodes(d3.values(nodes))
+                        .force("link", d3.forceLink(links).distance(100))
+                        .force('center', d3.forceCenter(width / 2, height / 2))
+                        .force("x", d3.forceX())
+                        .force("y", d3.forceY())
+                        .force("charge", d3.forceManyBody().strength(-250))
+                        .alphaTarget(1)
+                        .on("tick", tick);
+
+                    var svg = d3.select("#artist_graph")
+
+                    var path = svg.append("g")
+                        .attr("stroke", "#FF0000")
+                        .selectAll("path")
+                        .data(links)
+                        .enter()
+                        .append("path")
+                        .attr("class", function (d) { return "link " + d.type; })
+                        .style("stroke", function (d) {
+                            if (d.freq >= 1000) {
+                                return "green";
+                            } else {
+                                return "gray"
+                            }
+                        })
+                        .style("stroke-width", 2);
+
+                    var node = svg.selectAll(".node")
+                        .data(force.nodes())
+                        .enter().append("g")
+                        .attr("class", "node");
+
+                    node.append("circle")
+                        .attr("id", function (d) {
+                            return (d.name.replace(/\s+/g, '').toLowerCase());
+                        })
+                        .attr("r", function (d) {
+                            if (d.index == 0) {
+                                return 30
+                            } else if (d.index <= 10) {
+                                return 15
+                            } else {
+                                return 8
+                            }
+                        })
+                        .style("fill", function (d) {
+                            if (d.index == 0) {
+                                return "green"
+                            } else if (d.index <= 10) {
+                                return "lightblue"
+                            } else {
+                                return "gray"
+                            }
+                        })
+                        .each(function () {
+                            d3.select(this).on('click', function (d) {
+                            })
+                        });
+
+                    node.append('text')
+                        .style("font-weight", 700)
+                        .text(function (d) {
+                            return d.name;
+                        })
+                        .attr('x', 0)
+                        .attr('y', 0);
+
+                    function tick() {
+                        path.attr("d", function (d) {
+                            var dx = d.to.x - d.from.x,
+                                dy = d.to.y - d.from.y,
+                                dr = Math.sqrt(dx * dx + dy * dy);
+                            return "M" +
+                                d.from.x + "," +
+                                d.from.y + "A" +
+                                dr + "," + dr + " 0 0,1 " +
+                                d.to.x + "," +
+                                d.to.y;
+                        });
+
+                        node.attr("transform", function (d) {
+                            return "translate(" + d.x + "," + d.y + ")";
+                        });
+                    };
+
+                }).catch(function (error) {
+                    console.log(error);
+                });
+        }
     </script>
 </body>
 
