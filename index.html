@@ -107,6 +107,7 @@
             var artist_name = art_name;
             var links;
             var data;
+            var tracks;
 
             fetch("https://rmanaqd7j4.execute-api.us-east-1.amazonaws.com/default/spot?artist=" + artist_name, requestOptions)
                 .then(response => response.text())
@@ -115,6 +116,7 @@
                     data = data['body']
 
                     links = data['edges'];
+                    tracks = data['tracks'];
                 })
                 .then(function (f) {
                     var nodes = {};
@@ -132,6 +134,7 @@
 
                     console.log(nodes)
                     console.log(links)
+                    console.log(tracks)
                     var width = 800;
                     var height = 800;
 
