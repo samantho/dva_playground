@@ -89,6 +89,7 @@
         var top2;
         var top3;
         var chart;
+        const accessToken = 'BQBOlc40OYV6fv7yyfWtdO3b7sQigD68Xx-SQ9q0TsJBzUUW3QZ6G7AKUf25tjlrQgxWX1BzFhYouwElskmtb8LvHFCXkL4z9QTA4WcWwALITcUO_MGAQ_3gxqiBCEeTB_qmPT0OTEflDVlNtaFwBdgZKWYt-H_chULwzJCUsS7GHklcXA';
 
         // This function is triggered once the artist selection form was submitted
         async function validateForm() {
@@ -300,7 +301,6 @@
                         // trackUris.unshift(song_uri)
                         // trackUris = trackUris.map(uri => uri.replace('spotify:track:', ''));
 
-                        const accessToken = 'BQBOlc40OYV6fv7yyfWtdO3b7sQigD68Xx-SQ9q0TsJBzUUW3QZ6G7AKUf25tjlrQgxWX1BzFhYouwElskmtb8LvHFCXkL4z9QTA4WcWwALITcUO_MGAQ_3gxqiBCEeTB_qmPT0OTEflDVlNtaFwBdgZKWYt-H_chULwzJCUsS7GHklcXA';
                         const fetchTrackData = async (trackUri) => {
                             const response = await fetch(`https://api.spotify.com/v1/audio-features/${trackUri.song}`, {
                                 headers: {
