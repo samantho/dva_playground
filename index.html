@@ -89,7 +89,7 @@
         var top2;
         var top3;
         var chart;
-        const accessToken = 'BQBOlc40OYV6fv7yyfWtdO3b7sQigD68Xx-SQ9q0TsJBzUUW3QZ6G7AKUf25tjlrQgxWX1BzFhYouwElskmtb8LvHFCXkL4z9QTA4WcWwALITcUO_MGAQ_3gxqiBCEeTB_qmPT0OTEflDVlNtaFwBdgZKWYt-H_chULwzJCUsS7GHklcXA';
+        const accessToken = 'BQDJCeonrLM0TI0Rm4cdPW0OEyIhBLi0nmz5kA4YPdLUX0dNINKUCqS9o4rCthaNUyW8Aj5-EuqplozI9aKONKeUQAu0D3v_yQdqh8NvbIdaGH8PLMxC-Iy_jcSMOSU06qT5oD2h8Mez1Ldpkd6xw53pFZ9jcO1xx7K0b8xoSO4w7VtRog';
 
         // This function is triggered once the artist selection form was submitted
         async function validateForm() {
@@ -322,9 +322,12 @@
                                 if (math.norm(song_values) > 0) {
                                     // IF SIMILARITY SWITCHED, MUST SWITCH SCORING
                                     // cosine similarity
-                                    data['similarity'] = math.dot(first_song, song_values) / (math.norm(first_song) * math.norm(song_values));//first_song.id;
+                                    // data['similarity'] = math.dot(first_song, song_values) / (math.norm(first_song) * math.norm(song_values));//first_song.id;
                                     // euclidean distance
-                                    // data['similarity'] = math.sqrt(math.sum(math.square(math.subtract(first_song, song_values))));
+                                    data['similarity'] = math.sqrt(math.sum(math.square(math.subtract(first_song, song_values))));
+                                    // euclidean similarity
+                                    // data['similarity'] = 1 / (1 + (math.sqrt(math.sum(math.square(math.subtract(first_song, song_values))))));
+                                    // data['similarity'] = 1 / (math.exp(math.sqrt(math.sum(math.square(math.subtract(first_song, song_values))))));
                                     data['artist'] = trackUri.artist;
                                     data['track'] = trackUri.track;
                                 }
@@ -353,16 +356,20 @@
                                 first_pass = false;
                                 get_song_data(trackUris);
                             } else {
-                                // cosine
-                                data = data.sort((a, b) => b.similarity - a.similarity);
+                                // cosine or euclidean similarity
+                                // data = data.sort((a, b) => b.similarity - a.similarity);
                                 // euclidean
-                                // data = data.sort((a, b) => a.similarity - b.similarity);
+                                data = data.sort((a, b) => a.similarity - b.similarity);
                                 // At this point, data is collected for every song to see how similar it is to the chosen song
                                 // This dataframe is sorted by similarity and must be subset to the top three artists
                                 // console.log(data);
-                                d3.select("#first-song").html("Top Recommended Artist is " + top1 + ". We think you will like their song " + data.filter(track => track.artist == top1)[0]['track']);
-                                d3.select("#second-song").html("Second Recommended Artist is " + top2 + ". We think you will like their song " + data.filter(track => track.artist == top2)[0]['track']);
-                                d3.select("#third-song").html("Third Recommended Artist is " + top3 + ". We think you will like their song " + data.filter(track => track.artist == top3)[0]['track']);
+                                console.log(data);
+
+                                // similarity score is 1 - (euclidean / max(euclidean))
+
+                                d3.select("#first-song").html("Top Recommended Artist is " + top1 + ". We think you will like their song " + data.filter(track => track.artist == top1)[0]['track'] + ". Similarity score: " + (1 - (data.filter(track => track.artist == top1)[0]['similarity'] / data.filter(track => track.artist == top1).at(-1)['similarity'])));
+                                d3.select("#second-song").html("Second Recommended Artist is " + top2 + ". We think you will like their song " + data.filter(track => track.artist == top2)[0]['track'] + ". Similarity score: " + (1 - (data.filter(track => track.artist == top2)[0]['similarity'] / data.filter(track => track.artist == top2).at(-1)['similarity'])));
+                                d3.select("#third-song").html("Third Recommended Artist is " + top3 + ". We think you will like their song " + data.filter(track => track.artist == top3)[0]['track'] + ". Similarity score: " + (1 - (data.filter(track => track.artist == top3)[0]['similarity'] / data.filter(track => track.artist == top3).at(-1)['similarity'])));
                             }
                         });
                     }
