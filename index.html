@@ -89,7 +89,7 @@
         var top2;
         var top3;
         var chart;
-        
+
         /**
          * HOW TO GET AN ACCESS TOKEN: 
          * - Sign up for a Spotify Developer Account (free)
@@ -103,7 +103,7 @@
         **/
 
         const accessToken = 'BQAG4VPWwfOS0hk0ZTtaQyj2FOSNUR8Zy-lcu39M-gHr8j-JWCyQWpB1Rf9HKUFCzjCpKp4uPN8Uf96TaoQRbFpg427UTSxZ0Itde213WIzgAzE36t1x'
-        
+
         // This function is triggered once the artist selection form was submitted
         async function validateForm() {
             let x = document.getElementById("artistSelect").value;
@@ -202,18 +202,95 @@
                         .attr("class", function (d) { return "link " + d.type; })
                         .style("stroke", function (d) {
                             // if (d.freq >= 1000) {
-                                // return "green";
+                            // return "green";
                             // } else {
-                                // return "gray"
+                            // return "gray"
                             // }
                             return "gray"
                         })
-                        .style("stroke-width", 2);
+                        .style("stroke-width", 2)
+                        .on("mouseover", function (d) {
+                            d3.select(this).style("stroke-width", "5");
+                            var tooltip = d3.select("#tooltip");
+                            tooltip.style("visibility", "visible")
+                                .html("source: " + d.from.name + "<br>" +
+                                    "target: " + d.to.name + "<br>" +
+                                    "freq: " + d.freq + "<br>")
+                                .style("left", (d3.event.pageX + 10) + "px")
+                                .style("top", (d3.event.pageY - 10) + "px");
+                        })
+                        .on("mouseout", function () {
+                            d3.select(this).style("stroke-width", "2");
+                            var tooltip = d3.select("#tooltip");
+                            tooltip.style("visibility", "hidden");
+                        });
 
                     var node = svg.selectAll(".node")
                         .data(force.nodes())
                         .enter().append("g")
-                        .attr("class", "node");
+                        .attr("class", "node")
+                        .call(d3.drag()
+                            .on("start", dragstarted)
+                            .on("drag", dragged)
+                            .on("end", dragended))
+                        .on("mouseover", function (d) {
+                            d3.select(this).style("stroke-width", "5");
+                            var tooltip = d3.select("#tooltip");
+                            tooltip.style("visibility", "visible")
+                                .html(function(e){
+                                    if(d.index == 0){
+                                        return "<b>" + d.name + "</b><br>" + 
+                                            "Top Recommendation: " + top1 + "<br>" +
+                                            "Second Rec: " + top2 + "<br>" +
+                                            "Third Rec: " + top3 + "<br>"
+                                    } else if (d.index <= 10){
+                                        return "Recommendation " + d.index + ": " + d.name
+                                    }
+                                    return d.name
+                                })
+                                .style("left", (d3.event.pageX + 10) + "px")
+                                .style("top", (d3.event.pageY - 10) + "px");
+                        })
+                        .on("mouseout", function () {
+                            d3.select(this).style("stroke-width", "2");
+                            var tooltip = d3.select("#tooltip");
+                            tooltip.style("visibility", "hidden");
+                        });;
+
+                    var tooltip = d3.select("body")
+                        .append("div")
+                        .attr("id", "tooltip")
+                        .style("position", "absolute")
+                        .style("background-color", "white")
+                        .style("border", "1px solid black")
+                        .style("padding", "5px")
+                        .style("visibility", "hidden");
+
+                    function dragstarted(d) {
+                        if (!d3.event.active) force.alphaTarget(0.3).restart();
+                        d.fx = d.x;
+                        d.fy = d.y;
+                    };
+
+                    function dragged(d) {
+                        d.fx = d3.event.x;
+                        d.fy = d3.event.y;
+                        d.fixed = true;
+                    };
+
+                    function dragended(d) {
+                        if (!d3.event.active) force.alphaTarget(0);
+                        console.log(d.fixed);
+                        if (d.fixed == true) {
+                            d.fx = d.x;
+                            d.fy = d.y;
+                        }
+                        else {
+                            d.fx = null;
+                            d.fy = null;
+                        }
+                    };
+
 
                     // var colors = ['#e5f5e0','#c7e9c0','#a1d99b','#74c476','#41ab5d','#238b45','#006d2c','#00441b', '#00441b', '#00441b']
                     // var colors = ['#f0b501', '#f3c12a', '#f7cc42', '#fbd756', '#ffe26a']
@@ -237,7 +314,7 @@
                                 return "green"
                                 // return "#f3c12a"
                             } else if (d.index <= 10) {
-                                if(d.index <= 3)
+                                if (d.index <= 3)
                                     // return colors[d.index - 1]
                                     return "#f3c12a"
                                 else
@@ -250,6 +327,8 @@
                         })
                         .each(function () {
                             d3.select(this).on('click', function (d) {
+                                d3.select(this).fixed = false;
+                                d.fixed = false;
                             })
                         });
 
