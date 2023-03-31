@@ -89,8 +89,21 @@
         var top2;
         var top3;
         var chart;
-        const accessToken = 'BQCUy0-491SfJVpPMG0RfV54tvL4ofv2qhYMb4CRnN13H0q8vAqQbvrdKYAGC4V15aApS10S_Qe6RdUIFo_TUVRN3qedl_NqVlMyCn-GFNx4RMLlgGKKqnBamer07Tehk9tyyM9bF1BOb7iOf7UzJYzKfnrTQXz7BOgTFYmmVhxS4oEzyA';
+        
+        /**
+         * HOW TO GET AN ACCESS TOKEN: 
+         * - Sign up for a Spotify Developer Account (free)
+         * - Create an app in your Dashboard (https://developer.spotify.com/documentation/web-api/tutorials/getting-started#create-an-app)
+         * - Get the Client id and Client secret for the App
+         * - Run this curl request to generate a one-hour access token: 
+         *      curl -X POST "https://accounts.spotify.com/api/token" \
+                    -H "Content-Type: application/x-www-form-urlencoded" \
+                    -d "grant_type=client_credentials&client_id=your-client-id&client_secret=your-client-secret"
+         * - Replace the accessToken below with access token from request
+        **/
 
+        const accessToken = 'BQAG4VPWwfOS0hk0ZTtaQyj2FOSNUR8Zy-lcu39M-gHr8j-JWCyQWpB1Rf9HKUFCzjCpKp4uPN8Uf96TaoQRbFpg427UTSxZ0Itde213WIzgAzE36t1x'
+        
         // This function is triggered once the artist selection form was submitted
         async function validateForm() {
             let x = document.getElementById("artistSelect").value;
@@ -188,11 +201,12 @@
                         .append("path")
                         .attr("class", function (d) { return "link " + d.type; })
                         .style("stroke", function (d) {
-                            if (d.freq >= 1000) {
-                                return "green";
-                            } else {
-                                return "gray"
-                            }
+                            // if (d.freq >= 1000) {
+                                // return "green";
+                            // } else {
+                                // return "gray"
+                            // }
+                            return "gray"
                         })
                         .style("stroke-width", 2);
 
@@ -200,6 +214,10 @@
                         .data(force.nodes())
                         .enter().append("g")
                         .attr("class", "node");
+
+                    // var colors = ['#e5f5e0','#c7e9c0','#a1d99b','#74c476','#41ab5d','#238b45','#006d2c','#00441b', '#00441b', '#00441b']
+                    // var colors = ['#f0b501', '#f3c12a', '#f7cc42', '#fbd756', '#ffe26a']
+                    // var colors = ['#00441b','#238b45', '#74c476','#e5f5e0']
 
                     node.append("circle")
                         .attr("id", function (d) {
@@ -217,8 +235,15 @@
                         .style("fill", function (d) {
                             if (d.index == 0) {
                                 return "green"
+                                // return "#f3c12a"
                             } else if (d.index <= 10) {
-                                return "lightblue"
+                                if(d.index <= 3)
+                                    // return colors[d.index - 1]
+                                    return "#f3c12a"
+                                else
+                                    // return colors[3]
+                                    return '#ffffcc'
+                                // return "lightblue"
                             } else {
                                 return "gray"
                             }
