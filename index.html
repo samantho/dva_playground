@@ -61,6 +61,7 @@
     <script>
 
         var artist_names = [];
+        var artist_lower = [];
         var artist_uris = [];
 
         // Form listener for artist selection
@@ -78,6 +79,7 @@
         // Upload possible artist names
         d3.csv("artists.csv", (d) => {
             artist_names.push(d.artist_name)
+            artist_lower.push(d.artist_name.toLowerCase())
             artist_uris.push(d.artist_uri)
         }).then((d) => {
             // then give option to input once names are loaded
@@ -109,7 +111,9 @@
             let x = document.getElementById("artistSelect").value;
             document.getElementById("myForm");
             var error = document.getElementById("error")
-            if (artist_names.includes(x)) {
+            if (artist_lower.includes(x.toLowerCase())) {
+                x = artist_names[artist_lower.indexOf(x.toLowerCase())]
+
                 // If artist is found, print name in green
                 error.innerHTML = "<span style='color: green;'>" +
                     "Artist Chosen: " + x + "</span>";
@@ -244,7 +248,8 @@
                                             "Second Rec: " + top2 + "<br>" +
                                             "Third Rec: " + top3 + "<br>"
                                     } else if (d.index <= 10){
-                                        return "Recommendation " + d.index + ": " + d.name
+                                        return "Recommendation " + d.index + ": <b>" + d.name + "</b><br>" + 
+                                            "Frequency: " + links[d.index - 1].freq
                                     }
                                     return d.name
                                 })
