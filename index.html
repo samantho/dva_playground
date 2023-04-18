@@ -1,58 +1,237 @@
-<!DOCTYPE html>
+<!doctype html>
+<html lang="en">
 
 <head>
-    <style>
-        path.link {
-            fill: none;
-            stroke: #666;
-            stroke-width: 1.5px;
-        }
-
-        circle {
-            fill: #ccc;
-            stroke: #fff;
-            stroke: black;
-            stroke-width: 1.5px;
-        }
-
-        text {
-            fill: #000;
-            font: 10px sans-serif;
-            pointer-events: none;
-        }
-    </style>
     <meta charset="utf-8">
-    <title>Spotify Recommend</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Team 164 Music Recommender</title>
+
+    <!-- CSS FILES -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;300;400;700;900&display=swap"
+        rel="stylesheet">
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-icons.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/magnific-popup.css">
+
+    <link href="css/aos.css" rel="stylesheet">
+
+    <link href="css/templatemo-nomad-force.css" rel="stylesheet">
+
+    <link href="css/rec.css" rel="stylesheet">
 </head>
 
 <body>
-    <div id="artist_data">
-        <form onsubmit="validateForm()" id="myForm">
-            <label for="artistSelect">Artist name:</label><br>
-            <input id="artistSelect" name="artistSelect" type="text" required></input>
-            <input type="submit"></input><br>
-            <span id="error"></span>
-        </form>
-        <svg width="800" height="800" id="artist_graph"></svg>
-    </div>
-    <div id="song_data">
-        <form id="track-list-form">
-            <label for="track-name">Select a Track:</label>
-            <select id="track-name" name="track-name"></select>
-            <input type="submit" value="Select track">
-        </form>
-        <br><br>
-        <div id="first-artist">
-            <p id="first-song"></p>
-        </div>
-        <div id="second-artist">
-            <p id="second-song"></p>
-        </div>
-        <div id="third-artist">
-            <p id="third-song"></p>
-        </div>
-    </div>
 
+    <main>
+
+        <section class="hero" id="hero">
+            <div class="heroText">
+                <h1 class="text-white mt-5 mb-lg-4" data-aos="zoom-in" data-aos-delay="800">
+                    Team 164
+                </h1>
+
+                <p class="text-secondary-white-color" data-aos="fade-up" data-aos-delay="1000">
+                    create a great playlist for your <strong class="custom-underline">taste</strong>
+                </p>
+            </div>
+
+            <div class="videoWrapper">
+                <video autoplay="" loop="" muted="" class="custom-video"
+                    poster="videos/photo-1505740420928-5e560c06d30e.jpg">
+                </video>
+            </div>
+
+            <div class="overlay"></div>
+        </section>
+
+        <nav class="navbar navbar-expand-lg bg-light shadow-lg">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">
+                    <strong>DVA CSE6242 Sp23 - Team 164</strong>
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="#hero">Home</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#Scope">Scope</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#Background">Background</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#Recommender">Recommender</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#Results">Results</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <section class="section-padding pb-0" id="Scope">
+            <div class="container mb-5 pb-lg-5">
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="mb-5 text-center" data-aos="fade-up">Scope</h2>
+                        <p>The goal of this project is to create a unique, straightforward Spotify recommendation system that will produce suggested artists and songs for a given artist. The artist recommendation system is based on similarity graph analysis created from a large sample of user generated playlists on Spotify. The song recommendation algorithm is a similarity distance algorithm that leverages song attributes pulled from the Spotify API. The proposed integrated system is designed to be scalable and efficient, capable of handling large datasets and processing requests in real-time. 
+                        </p><p> 
+                        The problem at hand:
+                        <br> ◉ While the algorithms existing produce recommendations they tend to have bias towards much more recent, popular songs. 
+                        <br> ◉ Theres a lack of transparancy in how these algorithms work which creates trust issues and additional biases. 
+                        <br> ◉ Laziness in recommending popular and trending artists based on sheer listenership 
+                        <br> ◉ Sites like Spotify recommend artists to the users, but does not specify which songs the user may like
+                        <br> ◉ This behavior can result in overwhelming the user with the artist’s entire discography and causing them to tune out
+                        </p><p>
+                        Overall, while Spotify's recommendation algorithm is a useful tool for discovering the latest music, it may not always accurately capture users' unique and diverse preferences and may potentially overlook opportunities for music discovery outside of their usual listening habits. The proposed recommendation system would differ from this current method as it will be based on the population’s actual, tangible preferences. The recommendation system will leverage a network graph created from user generated playlists. This means they are actual preferences because it is unbiased by Spotify and is instead based on real users’ playlists and opinions. The artist recommendations will be produced by calculating the strength of the connection between artists, how often they are found on the same playlist. 
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="section-padding" id="Background">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-12">
+                        <h2 class="mb-5 text-center" data-aos="fade-up">Background</h2><p>
+                        The dataset used in this project is the Spotify Million Playlist Dataset. This dataset contains one million Spotify playlists and all the songs from 2010 to 2018 and can be found <a rel="nofollow" href="https://www.aicrowd.com/challenges/spotify-million-playlist-dataset-challenge" target="_blank"><b>here</b></a>. Due to its extreme size (30GB zipped) and limited processing power and time, for the scope of this project a random sample of playlists was taken from the data set. The resulting sample of 25,000 playlists was gathered and has the following characteristics. That sample netted 1.650 million total tracks of which 227,150 were unique and had 56,322 unique artists. Since the scope of this project is artist and song recommendation the average occurance rate for an artist to be on a playlist is 16.7. Digging deeper, looking at the top 20 artists and the histogram of artists highlights one of the challenges. User created playlists create a recency effect increasing representation of popular artists at the time of sampling. The histogram highlights that 53,455 of the artists (94.9%) appear on 50 or fewer playlists. This is an inherent challenge in using any playlist data and while this project is a subset of the full data source the top twenty artists are relatively unchanged between the two. 
+                        <br><br>
+                        The project, based on this data, has three key components: 
+                        <br> ◉ Providing the user with similar artists to the one they select (complete with interactive similarity graph)
+                        <br> ◉ Providing song recommendations based on the similar artists and the user’s selected songs
+                        <br> ◉ Visualizations of the underlying data which provides transparency.
+                        <br><br>Each of these are a unique innovation and are described in-depth below. 
+                        
+                        <br><br>
+                        The first component is the artist recommendation system built on the similarity graph. First, the user selects an artist in the dataset from a dropdown menu. The submission of their chosen artist triggers a JavaScript fetch to an API in the AWS API Gateway. After, an AWS Lambda Function is executed that runs a Python algorithm for the recommendation system. The data is processed on the cloud in AWS because its processing time was significantly reduced as compared to loading and processing on page load in JavaScript. The method of determining similar artists to the one chosen is simply calculating the frequency that each artist appears with other artists across all playlists. For example, if Drake is in 100 playlists with Future, but only 10 with Rihanna, then Future will be recommended over Rihanna. This function then generates JSON data of the edge node graph, and this is returned as the response from the API call. Based on that data, the JavaScript library d3 is leveraged to generate and show a node graph starting with the chosen artist and showing the similar artist recommendations, and strength of those connections, as well as similar artists to those artists. The user is then able to visualize how frequently artists are found together on playlists. 
+                        <br><br>
+                        The next component of the project is the song recommendation system. Based on the user selected artist, the user will be presented with a dropdown menu of their songs. Once a favorite song is selected, the top three artists that were recommended in the algorithm above are retained to use in the next step. From the user selected song and every song by each of the top three suggested artists, the code retrieves the track and track_uri. From this data, a few hundred async API requests are sent to Spotify’s API to return song attributes. These attributes are values such as acousticness, loudness, danceability, energy, and more. Once those values are returned, a comparison algorithm based on JavaScript runs to determine which song from each recommended artist is most like the user selected song. The current algorithm being used is cosine similarity, however there will be further experimentation and testing of other algorithms to ensure the most accurate similarity measure is used in the final iteration. These songs and top artists are then visualized for the user, along with their similarity score. 
+                        <br><br>
+                        The last component is the visualization of the underlying data. Important pillars of any reputable AI (Artificial Intelligence) company are transparency and explainability. In order to achieve this, the project will be integrating a Tableau dashboard which will visualize the attributes of the data to show exactly what the models were trained on and how representative the data is. An example of a visualization would be the representation of different genres in the dataset. This will also be good for validating that the sample of data being used is representative. 
+                        </p>
+
+<!--- -->
+                        <div class='tableauPlaceholder' id='viz1681570260859' style='position: relative'><noscript><a href='#'><img alt='Summary Stats  ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Su&#47;SummaryStats_16795418483560&#47;SummaryStats_1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='SummaryStats_16795418483560&#47;SummaryStats_1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Su&#47;SummaryStats_16795418483560&#47;SummaryStats_1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1681570260859');                    var vizElement = divElement.getElementsByTagName('object')[0];                    if ( divElement.offsetWidth > 800 ) { vizElement.style.width='1000px';vizElement.style.height='627px';} else if ( divElement.offsetWidth > 500 ) { vizElement.style.width='1000px';vizElement.style.height='627px';} else { vizElement.style.width='100%';vizElement.style.height='777px';}                     var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="Recommender section-padding" id="Recommender">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-12">
+                        <h2 class="mb-5 text-center" data-aos="fade-up">Recommender</h2>
+
+                        <div id="artist_data">
+                            <form onsubmit="validateForm()" id="myForm">
+                                <label for="artistSelect">Artist name:</label><br>
+                                <input id="artistSelect" name="artistSelect" type="text" required></input>
+                                <input type="submit"></input><br>
+                                <span id="error"></span>
+                            </form>
+                            <svg width="1500" height="1000" id="artist_graph"></svg>
+                        </div>
+                        <div id="song_data">
+                            <form id="track-list-form">
+                                <label for="track-name">Select a Track:</label>
+                                <select id="track-name" name="track-name"></select>
+                                <input type="submit" value="Select track">
+                            </form>
+                            <br><br>
+                            <div id="first-artist">
+                                <p id="first-song"></p>
+                            </div>
+                            <div id="second-artist">
+                                <p id="second-song"></p>
+                            </div>
+                            <div id="third-artist">
+                                <p id="third-song"></p>
+                            </div>
+                        </div>
+                        <br>
+                        <button data-tf-popup="R6HuYb2P" data-tf-opacity="100" data-tf-size="100" data-tf-iframe-props="title=Customer Feedback Survey" data-tf-transitive-search-params data-tf-medium="snippet" style="all:unset;font-family:Helvetica,Arial,sans-serif;display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background-color:#0445AF;color:#fff;font-size:20px;border-radius:25px;padding:0 33px;font-weight:bold;height:50px;cursor:pointer;line-height:50px;text-align:center;margin:0;text-decoration:none;">Feedback!</button><script src="//embed.typeform.com/next/embed.js"></script>
+                    </div>
+
+
+                </div>
+            </div>
+            </div>
+            </div>
+
+            </div>
+            </div>
+        </section>
+
+        <section class="results section-padding" id="Results">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="mb-5 text-center" data-aos="fade-up">Results</h2><p>
+                        A feedback form was created asking users to provide feedback on the artist searched, and how the three artist recommendations and three song recommendations aligned with their taste the form also sought feedback on the user interaction. The finished site/recommender was sent to 100 people for testing and feedback. Response rate was 87%. Of artists searched 74 of the 87 were unique (85.0%), 10 (11.5%) were selected twice and 3 (3.5%) were selected 3 times. Breaking down recommendation success rate, overall artist recommendation was 78.2% with the best success on the first artist recommendation (85.5%) sliding to 71.4% for the third recommendation. For song recommendation a similar effect was recorded though aggregate was slightly lower verse artist recommendation. Song aggregate came in at 76.6% with first recommendation at 87.8% and third at 64.6%. User interaction came back fairly strong with a score of 88.5%. Free form comments were collected with the feedback to add context to numerical scores for continuous improvement.  
+                    </p>
+ 
+             <div class='tableauPlaceholder' id='viz1681431639573' style='position: relative'><noscript><a href='#'><img alt='Results ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Su&#47;SummaryStats_16795418483560&#47;Results&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='SummaryStats_16795418483560&#47;Results' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Su&#47;SummaryStats_16795418483560&#47;Results&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1681431639573');                    var vizElement = divElement.getElementsByTagName('object')[0];                    if ( divElement.offsetWidth > 800 ) { vizElement.style.width='1000px';vizElement.style.height='827px';} else if ( divElement.offsetWidth > 500 ) { vizElement.style.width='1000px';vizElement.style.height='827px';} else { vizElement.style.width='100%';vizElement.style.height='1477px';}                     var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>    
+
+                                                
+                    </div>
+
+
+                </div>
+
+            </div>
+            </div>
+            </div>
+
+            </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row">
+            </div>
+            </section>
+    </footer>
+
+    <!-- JAVASCRIPT FILES -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/jquery.sticky.js"></script>
+    <script src="js/aos.js"></script>
+    <script src="js/jquery.magnific-popup.min.js"></script>
+    <script src="js/magnific-popup-options.js"></script>
+    <script src="js/scrollspy.min.js"></script>
+    <script src="js/custom.js"></script>
+    <!-- <script src="js/rec.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
@@ -241,14 +420,14 @@
                             d3.select(this).style("stroke-width", "5");
                             var tooltip = d3.select("#tooltip");
                             tooltip.style("visibility", "visible")
-                                .html(function(e){
-                                    if(d.index == 0){
-                                        return "<b>" + d.name + "</b><br>" + 
+                                .html(function (e) {
+                                    if (d.index == 0) {
+                                        return "<b>" + d.name + "</b><br>" +
                                             "Top Recommendation: " + top1 + "<br>" +
                                             "Second Rec: " + top2 + "<br>" +
                                             "Third Rec: " + top3 + "<br>"
-                                    } else if (d.index <= 10){
-                                        return "Recommendation " + d.index + ": <b>" + d.name + "</b><br>" + 
+                                    } else if (d.index <= 10) {
+                                        return "Recommendation " + d.index + ": <b>" + d.name + "</b><br>" +
                                             "Frequency: " + links[d.index - 1].freq
                                     }
                                     return d.name
