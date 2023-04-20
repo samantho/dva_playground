@@ -283,7 +283,7 @@
          * - Replace the accessToken below with access token from request
         **/
 
-        const accessToken = 'BQDM549SY1jGrTRKJZJlvXCB8oVGkxX4W2rwilJMtKLtkkFWaqjyKoUd6GFrJ84EopPbJCwiYWaQqIz-8O45FYvhy4dNheFn1zBt8qAyPWKsxTkl9zAz'
+        const accessToken = 'BQDu3Lw19pY280ToS7xvq8Yf9PMxgnllDjBy2tj4w_aiYhYJvKPev7WvnS0vtv1L7XqAHSudspe1Ns20nvD1VDZAtk-EMw69SwTr5nv4-QjHpOdMRSe5'
 
         // This function is triggered once the artist selection form was submitted
         async function validateForm() {
@@ -464,7 +464,7 @@
 
                     function dragended(d) {
                         if (!d3.event.active) force.alphaTarget(0);
-                        console.log(d.fixed);
+                        // console.log(d.fixed);
                         if (d.fixed == true) {
                             d.fx = d.x;
                             d.fy = d.y;
@@ -548,7 +548,7 @@
                     // console.log('I am after graph generation');
                     console.log(tracks)
                     drop_list = tracks.filter(track => track.artist_name == artist_name);
-                    console.log(drop_list)
+                    // console.log(drop_list)
                     dropdown = d3.select('#track-name')
 
                     dropdown.selectAll('option')
@@ -589,6 +589,16 @@
                         // trackUris.unshift(song_uri)
                         // trackUris = trackUris.map(uri => uri.replace('spotify:track:', ''));
 
+                        function cosine(A, B){
+                            var dp = mA = mB = 0;
+                            for(i = 0; i < A.length; i++){
+                                dp += (A[i] * B[i]);
+                                mA += (A[i]*A[i]);
+                                mB += (B[i]*B[i]);
+                            }
+                            return (dp)/((Math.sqrt(mA))*(Math.sqrt(mB)))
+                        }
+
                         const fetchTrackData = async (trackUri) => {
                             const response = await fetch(`https://api.spotify.com/v1/audio-features/${trackUri.song}`, {
                                 headers: {
@@ -611,8 +621,9 @@
                                     // IF SIMILARITY SWITCHED, MUST SWITCH SCORING
                                     // cosine similarity
                                     // data['similarity'] = math.dot(first_song, song_values) / (math.norm(first_song) * math.norm(song_values));//first_song.id;
+                                    data['similarity'] = cosine(first_song, song_values);
                                     // euclidean distance
-                                    data['similarity'] = math.sqrt(math.sum(math.square(math.subtract(first_song, song_values))));
+                                    // data['similarity'] = math.sqrt(math.sum(math.square(math.subtract(first_song, song_values))));
                                     // euclidean similarity
                                     // data['similarity'] = 1 / (1 + (math.sqrt(math.sum(math.square(math.subtract(first_song, song_values))))));
                                     // data['similarity'] = 1 / (math.exp(math.sqrt(math.sum(math.square(math.subtract(first_song, song_values))))));
@@ -645,19 +656,34 @@
                                 get_song_data(trackUris);
                             } else {
                                 // cosine or euclidean similarity
-                                // data = data.sort((a, b) => b.similarity - a.similarity);
+                                data = data.sort((a, b) => b.similarity - a.similarity);
                                 // euclidean
-                                data = data.sort((a, b) => a.similarity - b.similarity);
+                                // data = data.sort((a, b) => a.similarity - b.similarity);
                                 // At this point, data is collected for every song to see how similar it is to the chosen song
                                 // This dataframe is sorted by similarity and must be subset to the top three artists
                                 // console.log(data);
-                                console.log(data);
+                                // console.log(data);
 
                                 // similarity score is 1 - (euclidean / max(euclidean))
 
-                                d3.select("#first-song").html("Top Recommended Artist is " + top1 + ". We think you will like their song " + data.filter(track => track.artist == top1)[0]['track'] + ". Similarity score: " + ((1 - (data.filter(track => track.artist == top1)[0]['similarity'] / data.filter(track => track.artist == top1).at(-1)['similarity']))*100).toFixed(2) + "%");
-                                d3.select("#second-song").html("Second Recommended Artist is " + top2 + ". We think you will like their song " + data.filter(track => track.artist == top2)[0]['track'] + ". Similarity score: " + ((1 - (data.filter(track => track.artist == top2)[0]['similarity'] / data.filter(track => track.artist == top2).at(-1)['similarity']))*100).toFixed(2) + "%");
-                                d3.select("#third-song").html("Third Recommended Artist is " + top3 + ". We think you will like their song " + data.filter(track => track.artist == top3)[0]['track'] + ". Similarity score: " + ((1 - (data.filter(track => track.artist == top3)[0]['similarity'] / data.filter(track => track.artist == top3).at(-1)['similarity']))*100).toFixed(2) + "%");
+                                // for cosine
+                                // what percentage is 75 from 100 to 50? --> its 50%
+                                // 75-50 = 25   /   100-50 = 50   = 50%
+                                // what percentage is 60 from 100 to 50? --> its 20%
+                                // 60-50 = 10   /   100-50 = 50   = 20%
+                                // so the formula should be high - low / 1.0 - low
+
+                                fsim = Math.floor(((data.filter(track => track.artist == top1)[0]['similarity'] - data.filter(track => track.artist == top1).at(-1)['similarity']) / (1.0 - data.filter(track => track.artist == top1).at(-1)['similarity']) * 100) * 1000) / 1000 + "%";
+                                ssim = Math.floor(((data.filter(track => track.artist == top2)[0]['similarity'] - data.filter(track => track.artist == top2).at(-1)['similarity']) / (1.0 - data.filter(track => track.artist == top2).at(-1)['similarity']) * 100) * 1000) / 1000 + "%";
+                                tsim = Math.floor(((data.filter(track => track.artist == top3)[0]['similarity'] - data.filter(track => track.artist == top3).at(-1)['similarity']) / (1.0 - data.filter(track => track.artist == top3).at(-1)['similarity']) * 100) * 1000) / 1000 + "%";
+
+                                d3.select("#first-song").html("Top Recommended Artist is " + top1 + ". We think you will like their song " + data.filter(track => track.artist == top1)[0]['track'] + ". Similarity score: " + fsim);
+                                d3.select("#second-song").html("Second Recommended Artist is " + top2 + ". We think you will like their song " + data.filter(track => track.artist == top2)[0]['track'] + ". Similarity score: " + ssim);
+                                d3.select("#third-song").html("Third Recommended Artist is " + top3 + ". We think you will like their song " + data.filter(track => track.artist == top3)[0]['track'] + ". Similarity score: " + tsim)
+
+                                // d3.select("#first-song").html("Top Recommended Artist is " + top1 + ". We think you will like their song " + data.filter(track => track.artist == top1)[0]['track'] + ". Similarity score: " + ((1 - (data.filter(track => track.artist == top1)[0]['similarity'] / data.filter(track => track.artist == top1).at(-1)['similarity']))*100).toFixed(2) + "%");
+                                // d3.select("#second-song").html("Second Recommended Artist is " + top2 + ". We think you will like their song " + data.filter(track => track.artist == top2)[0]['track'] + ". Similarity score: " + ((1 - (data.filter(track => track.artist == top2)[0]['similarity'] / data.filter(track => track.artist == top2).at(-1)['similarity']))*100).toFixed(2) + "%");
+                                // d3.select("#third-song").html("Third Recommended Artist is " + top3 + ". We think you will like their song " + data.filter(track => track.artist == top3)[0]['track'] + ". Similarity score: " + ((1 - (data.filter(track => track.artist == top3)[0]['similarity'] / data.filter(track => track.artist == top3).at(-1)['similarity']))*100).toFixed(2) + "%");
                             }
                         });
                     }
