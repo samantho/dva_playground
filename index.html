@@ -655,9 +655,9 @@
 
                                 // similarity score is 1 - (euclidean / max(euclidean))
 
-                                d3.select("#first-song").html("Top Recommended Artist is " + top1 + ". We think you will like their song " + data.filter(track => track.artist == top1)[0]['track'] + ". Similarity score: " + (1 - (data.filter(track => track.artist == top1)[0]['similarity'] / data.filter(track => track.artist == top1).at(-1)['similarity'])));
-                                d3.select("#second-song").html("Second Recommended Artist is " + top2 + ". We think you will like their song " + data.filter(track => track.artist == top2)[0]['track'] + ". Similarity score: " + (1 - (data.filter(track => track.artist == top2)[0]['similarity'] / data.filter(track => track.artist == top2).at(-1)['similarity'])));
-                                d3.select("#third-song").html("Third Recommended Artist is " + top3 + ". We think you will like their song " + data.filter(track => track.artist == top3)[0]['track'] + ". Similarity score: " + (1 - (data.filter(track => track.artist == top3)[0]['similarity'] / data.filter(track => track.artist == top3).at(-1)['similarity'])));
+                                d3.select("#first-song").html("Top Recommended Artist is " + top1 + ". We think you will like their song " + data.filter(track => track.artist == top1)[0]['track'] + ". Similarity score: " + ((1 - (data.filter(track => track.artist == top1)[0]['similarity'] / data.filter(track => track.artist == top1).at(-1)['similarity']))*100).toFixed(2) + "%");
+                                d3.select("#second-song").html("Second Recommended Artist is " + top2 + ". We think you will like their song " + data.filter(track => track.artist == top2)[0]['track'] + ". Similarity score: " + ((1 - (data.filter(track => track.artist == top2)[0]['similarity'] / data.filter(track => track.artist == top2).at(-1)['similarity']))*100).toFixed(2) + "%");
+                                d3.select("#third-song").html("Third Recommended Artist is " + top3 + ". We think you will like their song " + data.filter(track => track.artist == top3)[0]['track'] + ". Similarity score: " + ((1 - (data.filter(track => track.artist == top3)[0]['similarity'] / data.filter(track => track.artist == top3).at(-1)['similarity']))*100).toFixed(2) + "%");
                             }
                         });
                     }
